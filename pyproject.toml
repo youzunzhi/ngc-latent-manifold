@@ -1,0 +1,29 @@
+[project]
+name = "ngc"
+version = "0.1.0"
+description = "Neighborhood Graph Cost for planning with latent world models"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+dependencies = [
+  "stable-worldmodel @ git+https://github.com/galilai-group/stable-worldmodel@4506b1a40c4e9feacdac4150903480afe101639f",
+  "scipy",
+]
+
+[dependency-groups]
+dev = ["pytest"]
+
+[build-system]
+requires = ["uv_build>=0.9.21,<0.10.0"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-root = ""
+
+[tool.ruff]
+line-length = 79
+indent-width = 4
+
+[tool.ruff.format]
+indent-style = "space"
+quote-style = "single"
