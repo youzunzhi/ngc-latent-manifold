@@ -10,10 +10,22 @@ dependencies = [
   "numpy==2.2.6",
   "scipy==1.15.3",
   "torch==2.11.0",
+  "torchvision==0.26.0",
 ]
 
 [dependency-groups]
 dev = ["pytest"]
+
+[[tool.uv.index]]
+name = "pytorch-cu130"
+url = "https://download.pytorch.org/whl/cu130"
+explicit = true
+
+[tool.uv.sources]
+torch = [{ index = "pytorch-cu130", marker = "sys_platform == 'linux'" }]
+torchvision = [
+  { index = "pytorch-cu130", marker = "sys_platform == 'linux'" },
+]
 
 [build-system]
 requires = ["uv_build>=0.9.21,<0.10.0"]
