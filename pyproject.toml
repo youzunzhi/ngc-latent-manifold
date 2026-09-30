@@ -7,11 +7,13 @@ license = "MIT"
 requires-python = ">=3.10"
 dependencies = [
   "stable-worldmodel @ git+https://github.com/galilai-group/stable-worldmodel@4506b1a40c4e9feacdac4150903480afe101639f",
+  "h5py==3.16.0",
   "numpy==2.2.6",
   "scipy==1.15.3",
   "stable-pretraining==0.1.8",
   "torch==2.11.0",
   "torchvision==0.26.0",
+  "transformers==4.57.6",
 ]
 
 [dependency-groups]
