@@ -7,7 +7,9 @@ license = "MIT"
 requires-python = ">=3.10"
 dependencies = [
   "stable-worldmodel @ git+https://github.com/galilai-group/stable-worldmodel@4506b1a40c4e9feacdac4150903480afe101639f",
-  "scipy",
+  "numpy==2.2.6",
+  "scipy==1.15.3",
+  "torch==2.11.0",
 ]
 
 [dependency-groups]
