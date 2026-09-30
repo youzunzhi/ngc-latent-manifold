@@ -1,8 +1,11 @@
 """Offline part of NGC: the graph distance between graph nodes.
 
 The graph joins two nodes when each is among the ``neighbors`` nearest nodes
-of the other, with an edge as long as their Euclidean distance. The graph
-distance is the shortest-path length along these edges.
+of the other, with an edge as long as their Euclidean distance. While the
+graph has more than one component, the shortest Euclidean distance between
+two nodes of different components becomes an edge (a bridge); the bridges
+form a minimum spanning tree over the components, and a connected graph gets
+none. The graph distance is the shortest-path length along the edges.
 """
 
 import numpy as np
@@ -12,7 +15,11 @@ from scipy.spatial.distance import cdist
 
 
 def build_graph(latents, neighbors):
-    """Return float64 ``nodes`` [N, D] and ``graph_distance`` [N, N]."""
+    """Float64 ``nodes`` [N, D], ``graph_distance`` [N, N] and bridges.
+
+    ``bridges`` lists the node pairs ``(i, j)`` joined to connect the graph,
+    in the order they were added.
+    """
     nodes = np.asarray(latents, dtype=np.float64)
     assert nodes.ndim == 2 and len(nodes) > neighbors
     assert np.isfinite(nodes).all()
@@ -24,9 +31,20 @@ def build_graph(latents, neighbors):
     )
     listed = np.zeros(distance.shape, dtype=bool)
     listed[np.arange(len(nodes))[:, None], nearest] = True
-    row, col = np.nonzero(listed & listed.T)
+    linked = listed & listed.T
+    bridges = []
+    count, labels = connected_components(csr_matrix(linked), directed=False)
+    while count > 1:
+        between = np.where(
+            labels[:, None] != labels[None, :], distance, np.inf
+        )
+        i, j = np.unravel_index(np.argmin(between), between.shape)
+        linked[i, j] = linked[j, i] = True
+        bridges.append((int(i), int(j)))
+        count, labels = connected_components(
+            csr_matrix(linked), directed=False
+        )
+    row, col = np.nonzero(linked)
     edges = csr_matrix((distance[row, col], (row, col)), shape=distance.shape)
-    components = connected_components(edges, directed=False)[0]
-    assert components == 1, f'graph has {components} components'
     graph_distance = dijkstra(edges, directed=False)
-    return nodes, graph_distance
+    return nodes, graph_distance, bridges

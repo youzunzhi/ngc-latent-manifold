@@ -1,8 +1,6 @@
 """NGC on small graphs whose answers follow from the geometry.
 
-``expected_cost`` is an independent NumPy statement of the NGC cost. The
-bit-for-bit comparison with the implementation behind the paper's results
-is ``scripts/check_parity.py``.
+``expected_cost`` is an independent NumPy statement of the NGC cost.
 """
 
 import numpy as np
@@ -55,22 +53,36 @@ def test_graph_follows_the_arc():
     # Three quarters of a circle: the ends are 1.41 apart in the plane but
     # twelve steps apart along the arc, and only neighbors along the arc
     # are mutual 2-nearest neighbors.
-    nodes, graph_distance = build_graph(arc(13), neighbors=2)
+    nodes, graph_distance, _ = build_graph(arc(13), neighbors=2)
     chord = 2 * np.sin(STEP / 2)
     steps = np.abs(np.arange(13)[:, None] - np.arange(13)[None, :])
     np.testing.assert_allclose(graph_distance, steps * chord, rtol=1e-12)
     assert np.linalg.norm(nodes[0] - nodes[12]) < 4 * chord
 
 
-def test_graph_rejects_disconnected_and_repeated_nodes():
-    with pytest.raises(AssertionError, match='2 components'):
-        build_graph(np.concatenate([arc(5), arc(5) + 10]), neighbors=2)
+def test_graph_bridges_components_and_rejects_repeated_nodes():
+    # Two quarter arcs 10 apart form two components. The one bridge joins
+    # the closest pair: (1, 0) on the first arc, node 0, and (10, 1) on the
+    # second, node 9. Its ends 4 and 5 are then four steps from each bridge
+    # end.
+    shifted = arc(5) + [10, 0]
+    nodes, graph_distance, bridges = build_graph(
+        np.concatenate([arc(5), shifted]), neighbors=2
+    )
+    assert bridges == [(0, 9)]
+    chord = 2 * np.sin(STEP / 2)
+    bridge = np.linalg.norm(nodes[0] - nodes[9])
+    np.testing.assert_allclose(
+        graph_distance[4, 5], 4 * chord + bridge + 4 * chord, rtol=1e-12
+    )
+    _, _, none = build_graph(arc(13), neighbors=2)
+    assert none == []
     with pytest.raises(AssertionError, match='distinct'):
         build_graph(np.concatenate([arc(5), arc(1)]), neighbors=2)
 
 
 def test_cost_takes_the_route_along_the_arc():
-    nodes, graph_distance = build_graph(arc(13), neighbors=2)
+    nodes, graph_distance, _ = build_graph(arc(13), neighbors=2)
     model = NGCCost(nodes, graph_distance, neighbors=2, anchors=1)
     q = 1.05 * arc(1)
     g = 1.05 * nodes[12]
@@ -82,7 +94,7 @@ def test_cost_takes_the_route_along_the_arc():
 
 
 def test_cost_is_euclidean_within_both_radii():
-    nodes, graph_distance = build_graph(arc(13), neighbors=2)
+    nodes, graph_distance, _ = build_graph(arc(13), neighbors=2)
     model = NGCCost(nodes, graph_distance, neighbors=2, anchors=1)
     g = 1.02 * nodes[6]
     q = np.stack([g, 0.98 * nodes[6], 1.1 * nodes[7]])
@@ -103,7 +115,7 @@ def test_tied_ranks_resolve_to_the_lower_node_index():
     # Queries on a unit lattice at half-integer offsets have exactly equal
     # distances across the anchor (4th/5th) and radius (15th/16th) ranks.
     grid = np.stack(np.meshgrid(np.arange(7), np.arange(7)), -1)
-    nodes, graph_distance = build_graph(grid.reshape(-1, 2), neighbors=15)
+    nodes, graph_distance, _ = build_graph(grid.reshape(-1, 2), neighbors=15)
     model = NGCCost(nodes, graph_distance, neighbors=15, anchors=4)
     queries = np.array([[3.5, 3.0], [3.0, 3.5], [2.5, 3.5], [3.2, 2.9]])
     ids, distance, radius = (
@@ -123,7 +135,7 @@ def test_tied_ranks_resolve_to_the_lower_node_index():
 
 def test_batch_matches_single_goal_scoring():
     grid = np.stack(np.meshgrid(np.arange(7), np.arange(7)), -1)
-    nodes, graph_distance = build_graph(grid.reshape(-1, 2), neighbors=15)
+    nodes, graph_distance, _ = build_graph(grid.reshape(-1, 2), neighbors=15)
     model = NGCCost(nodes, graph_distance, neighbors=15, anchors=4)
     rng = np.random.default_rng(0)
     q = rng.uniform(0, 6, size=(2, 5, 2))
@@ -144,7 +156,7 @@ def test_batch_matches_single_goal_scoring():
 
 def test_goal_attachment_is_reused_until_the_goal_changes():
     grid = np.stack(np.meshgrid(np.arange(7), np.arange(7)), -1)
-    nodes, graph_distance = build_graph(grid.reshape(-1, 2), neighbors=15)
+    nodes, graph_distance, _ = build_graph(grid.reshape(-1, 2), neighbors=15)
     model = NGCCost(nodes, graph_distance, neighbors=15, anchors=4)
     q = np.array([[[0.3, 0.4], [5.2, 5.9]]])
     first, second = np.array([[1.5, 1.2]]), np.array([[4.4, 4.1]])
@@ -160,7 +172,7 @@ def test_goal_attachment_is_reused_until_the_goal_changes():
 
 
 def test_cost_keeps_the_prediction_dtype():
-    nodes, graph_distance = build_graph(arc(13), neighbors=2)
+    nodes, graph_distance, _ = build_graph(arc(13), neighbors=2)
     model = NGCCost(nodes, graph_distance, neighbors=2, anchors=1)
     q = arc(4).astype(np.float32)[None] * 1.01
     g = arc(1).astype(np.float32)
