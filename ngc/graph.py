@@ -26,9 +26,6 @@ def build_graph(latents, neighbors):
     distance = cdist(nodes, nodes)
     np.fill_diagonal(distance, np.inf)
     nearest = np.argsort(distance, axis=1, kind='stable')[:, :neighbors]
-    assert (distance[np.arange(len(nodes)), nearest[:, 0]] > 0).all(), (
-        'graph nodes must be distinct'
-    )
     listed = np.zeros(distance.shape, dtype=bool)
     listed[np.arange(len(nodes))[:, None], nearest] = True
     linked = listed & listed.T
@@ -45,6 +42,8 @@ def build_graph(latents, neighbors):
             csr_matrix(linked), directed=False
         )
     row, col = np.nonzero(linked)
+    # Repeated nodes are linked by edges of length zero; the sparse matrix
+    # stores them explicitly and dijkstra follows them.
     edges = csr_matrix((distance[row, col], (row, col)), shape=distance.shape)
     graph_distance = dijkstra(edges, directed=False)
     return nodes, graph_distance, bridges
