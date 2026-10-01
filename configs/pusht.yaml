@@ -1,0 +1,13 @@
+# PushT: push the T-shaped block to the goal pose.
+task: pusht
+image_size: 224
+world:
+  env_name: swm/PushT-v1
+keys_to_cache: [action, proprio, state]
+callables:
+  - method: _set_state
+    args:
+      state: {value: state}
+  - method: _set_goal_state
+    args:
+      goal_state: {value: goal_state}

@@ -1,0 +1,13 @@
+# TwoRoom: move the agent through the door to the goal position.
+task: tworoom
+image_size: 224
+world:
+  env_name: swm/TwoRoom-v1
+keys_to_cache: [action, proprio]
+callables:
+  - method: _set_state
+    args:
+      state: {value: pos_agent}
+  - method: _set_goal_state
+    args:
+      goal_state: {value: goal_pos_agent}
