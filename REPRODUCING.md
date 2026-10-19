@@ -46,8 +46,8 @@ cp experiments/example.yaml experiments/local.yaml
 
 Edit the four `datasets` entries in `experiments/local.yaml` to point to
 the extracted HDF5 files. The default checkpoint paths already match the
-downloader. Leave `training_datasets` and `checkpoints.official` unchanged;
-they are not used by the main evaluation.
+downloader. If you store checkpoints elsewhere, update the corresponding
+`checkpoints.project` paths.
 
 Use the committed files in `pairs/` to evaluate the paper's fixed pairs.
 The runner handles graph sampling and excludes the evaluation episodes.
@@ -89,7 +89,9 @@ criteria are in the [README](README.md#protocol-and-numerical-settings).
 
 ## Optional extensions
 
-Supplementary experiment settings and stages are documented in
+For training and supplementary studies, start from
+[experiments/supplementary.example.yaml](experiments/supplementary.example.yaml).
+Experiment settings and stages are documented in
 [experiments/plan.py](experiments/plan.py). Training code is in
 [training/lewm.py](training/lewm.py), and analysis code is in `analysis/`.
 These are not required for the main table. To download the additional

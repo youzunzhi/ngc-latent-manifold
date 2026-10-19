@@ -1,0 +1,16 @@
+# Optional training and supplementary studies: copy to a local config.
+python: .venv/bin/python
+datasets:
+  cube: data/cube_single_expert.h5
+  tworoom: data/tworoom.h5
+  pusht: data/pusht_expert_train.h5
+  reacher: data/reacher.h5
+training_datasets:
+  cube: data/cube_single_expert.h5
+  tworoom: data/tworoom.h5
+  pusht: data/pusht_expert_train.lance
+  reacher: data/reacher.h5
+training_root: checkpoints/training
+checkpoints:
+  project: checkpoints/project/{task}/weights_epoch_10.pt
+  official: checkpoints/official/{task}/weights.pt

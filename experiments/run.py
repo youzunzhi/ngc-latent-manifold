@@ -64,11 +64,7 @@ def main():
             'ladder', 'project', lambda t, s: plan.arms(t, s, 'project')
         )
     elif args.stage == 'main-nodes':
-        commands = [
-            c
-            for c in plan.nodes_stage()
-            if c.out.parent == root / 'nodes/project'
-        ]
+        commands = plan.graph_nodes('project')
     else:
         commands = plan.stage(args.stage)
     for command in commands:

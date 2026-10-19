@@ -49,56 +49,8 @@ Follow [REPRODUCING.md](REPRODUCING.md) to download the official datasets,
 run the main experiments, and compare the resulting table with the paper.
 Retraining is not required. The paper checkpoints are hosted at
 [Zunzhi/ngc-checkpoints](https://huggingface.co/Zunzhi/ngc-checkpoints).
-Download the four main checkpoints and verify every file's SHA-256:
-
-```bash
-uv run python scripts/download_checkpoints.py
-```
-
-The downloader uses the immutable revision recorded in
-`artifacts/checkpoint-inventory.json` and preserves the directory layout
-expected by the experiment configuration. Datasets are obtained separately
-from LeWM upstream. The 216 main-table outcome records are included in
-`artifacts/main-results.zip` for checking statistics without rerunning plans.
-
-Copy `experiments/example.yaml` to `experiments/local.yaml` and set the
-dataset paths. The default checkpoint paths match the download layout.
-The `training_datasets` and `official` checkpoint settings are used only by
-optional studies. Then inspect the commands:
-
-```bash
-uv run python -m experiments.run --config experiments/local.yaml --stage main-nodes
-uv run python -m experiments.run --config experiments/local.yaml --stage main-cells
-```
-
-Add `--execute` to each command to run that stage sequentially, nodes first.
-The runner stops on failure or an existing output rather than overwriting
-results. The default output directory is `outputs/paper`.
-
-```bash
-uv run python scripts/summarize.py --root outputs/paper > outputs/main-table.json
-```
-
-Compare the main-table success rates and paired differences with the
-bundled reference outcomes using the reproduction guide. GPU kernels,
-rendering, and stochastic planning can change individual trajectories;
-bitwise-identical outputs are not required.
-
-For one Cube evaluation, after building its nodes:
-
-```bash
-uv run python scripts/evaluate.py --config configs/cube.yaml \
-  --pairs pairs/cube/offset50-seed0.json --dataset data/cube_single_expert.h5 \
-  --checkpoint checkpoints/project/cube/weights_epoch_10.pt \
-  --protocol main --dynamics learned --cost ngc \
-  --nodes outputs/paper/nodes/project/cube-seed0.npz \
-  --neighbors 15 --anchors 4 --rule mutual --num-samples 300 --topk 30 \
-  --eval-budget 100 --planner-seed 42 --out outputs/cube-ngc.json
-```
-
-For L2, use `--cost l2` and omit `--nodes`, `--neighbors`, `--anchors`, and
-`--rule`. The result contains per-pair success, executed actions, planner
-settings, and timings.
+The guide covers data paths, graph construction, evaluation, and comparison
+with the bundled main-table outcomes. All commands and paths are kept there.
 
 ## Protocol and numerical settings
 

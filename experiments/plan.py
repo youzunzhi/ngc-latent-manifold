@@ -120,6 +120,9 @@ class Plan:
         return self.config['datasets'][task]
 
     def checkpoint(self, kind, task):
+        paths = self.config['checkpoints'][kind]
+        if isinstance(paths, dict):
+            return paths[task]
         if kind == 'project' and task in RETRAINED_TASKS:
             return str(self.trained(task, PROJECT_TRAINING_SEED))
         return self.config['checkpoints'][kind].format(task=task)
@@ -312,21 +315,20 @@ class Plan:
             ),
         )  # fmt: skip
 
+    def graph_nodes(self, kind):
+        """Graph builds for the fixed main-protocol pairs of one checkpoint set."""
+        return [
+            self.build_nodes(
+                self.checkpoint(kind, task), PROJECT_TRAINING_SEED, task,
+                [self.pairs(task, o, seed) for o in OFFSETS[task]], seed,
+                self.nodes(kind, task, seed),
+            )
+            for task in TASKS
+            for seed in PAIR_SEEDS
+        ]
+
     def nodes_stage(self):
-        commands = []
-        for kind in ('project', 'official'):
-            for task in TASKS:
-                for seed in PAIR_SEEDS:
-                    exclude = [
-                        self.pairs(task, o, seed) for o in OFFSETS[task]
-                    ]
-                    commands.append(
-                        self.build_nodes(
-                            self.checkpoint(kind, task),
-                            PROJECT_TRAINING_SEED, task, exclude, seed,
-                            self.nodes(kind, task, seed),
-                        )
-                    )  # fmt: skip
+        commands = self.graph_nodes('project') + self.graph_nodes('official')
         for kind in ('project', 'official'):
             for task in TASKS:
                 exclude = [self.lewm_pairs(task, p) for p in PLANNER_SEEDS]
