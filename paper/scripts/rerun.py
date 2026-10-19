@@ -19,7 +19,13 @@ import numpy as np
 
 REPO = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO))
-from analysis import success  # noqa: E402
+from analysis import main_results, success  # noqa: E402
+from analysis.main_results import (  # noqa: E402
+    PAPER_TASKS,
+    TASKS,
+    contrast,
+    ladder_rate_intervals,
+)
 from experiments.plan import (  # noqa: E402
     CEM_MULTIPLIERS,
     GRAPH_FRACTIONS,
@@ -41,108 +47,28 @@ RESULTS = RERUN / 'results'
 ORACLE_RESULTS = Path(os.environ.get('NGC_ORACLE_ROOT', RERUN)) / 'results'
 # Physical-distance bins use intervals over episodes.
 STRATA = Path(os.environ.get('NGC_STRATA_ROOT', RERUN / 'analysis/strata'))
-TASKS = [
-    ('cube', 'Cube'),
-    ('tworoom', 'TwoRoom'),
-    ('pusht', 'PushT'),
-    ('reacher', 'Reacher'),
-]
-# The order in which the paper presents the tasks. The bootstrap draws follow
-# TASKS, so this order leaves every interval unchanged.
-PAPER_TASKS = [
-    (task, dict(TASKS)[task])
-    for task in ('tworoom', 'reacher', 'cube', 'pusht')
-]
 ORACLE_PLANNER_SEED = 42
 CHECKPOINTS = ('project', 'official')
 
 
 def cells(study, task, pattern):
-    """Result files of one arm; ``pattern`` is a glob with ``{a,b}``
-    alternatives expanded."""
     results = ORACLE_RESULTS if study == 'oracle' else RESULTS
-    patterns = ['']
-    for piece in pattern.replace('}', '{').split('{'):
-        options = piece.split(',') if ',' in piece else [piece]
-        patterns = [p + o for p in patterns for o in options]
-    paths = sorted(
-        path
-        for p in patterns
-        for path in (results / study / task).glob(f'{p}.json')
-    )
-    assert paths, f'no {study}/{task}/{pattern}.json'
-    return paths
+    return main_results.cells(results, study, task, pattern)
 
 
 def arm(study, task, pattern):
-    """Per-pair success of one arm, the planner seeds averaged within a pair."""
     return success.pair_success(cells(study, task, pattern))
 
 
-def contrast(first, second, rng):
-    """``second`` minus ``first`` pair by pair, with the pair arrays."""
-    keys, a, b = success.paired(first, second)
-    record = success.difference(a, b, np.arange(len(keys)), rng)
-    record.update(keys=keys, first_pairs=a, second_pairs=b)
-    return record
-
-
 def ladder(study, l2_prefix, ngc_prefix, pair_seeds, planner_seeds):
-    """L2 cost against NGC on every task and offset, pooled over the pair
-    seeds: {task: {offset: contrast record with ``by_seed`` rates}}."""
-    rng = np.random.default_rng(success.BOOTSTRAP_SEED)
-    seeds = '{' + ','.join(map(str, pair_seeds)) + '}'
-    planners = '{' + ','.join(map(str, planner_seeds)) + '}'
-    out = {}
-    for task, _ in TASKS:
-        out[task] = {}
-        for offset in OFFSETS[task]:
-            l2 = arm(
-                study,
-                task,
-                f'{l2_prefix}-offset{offset}-seed{seeds}-planner{planners}',
-            )
-            ngc = arm(
-                study,
-                task,
-                f'{ngc_prefix}-offset{offset}-seed{seeds}-planner{planners}',
-            )
-            record = contrast(l2, ngc, rng)
-            assert record['pairs'] == 100 * len(pair_seeds)
-            record['by_seed'] = {
-                name: [
-                    100
-                    * np.mean(
-                        [
-                            r['success']
-                            for k, r in records.items()
-                            if f'seed{s}.json' in k[0]
-                        ]
-                    )
-                    for s in pair_seeds
-                ]
-                for name, records in (('l2', l2), ('ngc', ngc))
-            }
-            out[task][offset] = record
-    return out
-
-
-def ladder_rate_intervals(table):
-    """The per-arm intervals of a ladder table, drawn in figure order."""
-    rng = np.random.default_rng(success.BOOTSTRAP_SEED)
-    intervals = {}
-    for task, _ in TASKS:
-        for name in ('first', 'second'):
-            for offset, record in table[task].items():
-                pairs = record[f'{name}_pairs']
-                intervals[task, name, offset] = success.interval(
-                    pairs, np.arange(len(pairs)), rng
-                )
-    return intervals
+    results = ORACLE_RESULTS if study == 'oracle' else RESULTS
+    return main_results.ladder(
+        results, study, l2_prefix, ngc_prefix, pair_seeds, planner_seeds
+    )
 
 
 def main_ladder():
-    return ladder('ladder', 'l2', 'ngc', PAIR_SEEDS, PLANNER_SEEDS)
+    return main_results.main_ladder(RESULTS)
 
 
 def official_ladder():
