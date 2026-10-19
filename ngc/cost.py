@@ -7,12 +7,25 @@ is their Euclidean distance when it lies within both radii, and otherwise
 the shortest route ``q -> v_i -> ... -> v_j -> g`` over the anchors of ``q``
 and ``g``.
 
-All arithmetic is float64. Distances are computed from pairwise differences
-rather than the matrix-product expansion, so an exact goal match costs zero.
+All arithmetic is float32. The distances to the graph nodes use the
+matrix-product expansion ``|a|^2 + |b|^2 - 2 a.b``, which is fast but loses
+precision on short distances; the distance between a candidate and the goal
+uses their difference, so an exact goal match costs zero.
 """
 
 import torch
 from torch import nn
+
+
+def node_distances(latents, nodes):
+    """Ascending distances [M, N] from latents to graph nodes, and node ids.
+
+    Equal distances keep the node order.
+    """
+    distance = torch.cdist(
+        latents, nodes, compute_mode='use_mm_for_euclid_dist'
+    )
+    return torch.sort(distance, dim=1, stable=True)
 
 
 class NGCCost(nn.Module):
@@ -26,8 +39,8 @@ class NGCCost(nn.Module):
 
     def __init__(self, nodes, graph_distance, neighbors, anchors):
         super().__init__()
-        nodes = torch.as_tensor(nodes, dtype=torch.float64)
-        graph_distance = torch.as_tensor(graph_distance, dtype=torch.float64)
+        nodes = torch.as_tensor(nodes, dtype=torch.float32)
+        graph_distance = torch.as_tensor(graph_distance, dtype=torch.float32)
         assert nodes.ndim == 2 and len(nodes) > neighbors >= anchors >= 1
         assert graph_distance.shape == (len(nodes), len(nodes))
         assert torch.isfinite(graph_distance).all()
@@ -40,10 +53,7 @@ class NGCCost(nn.Module):
 
     def attach(self, latents):
         """Anchor ids and distances [M, anchors] and radius [M]."""
-        distance = torch.cdist(
-            latents, self.nodes, compute_mode='donot_use_mm_for_euclid_dist'
-        )
-        nearest, ids = torch.sort(distance, dim=1, stable=True)
+        nearest, ids = node_distances(latents, self.nodes)
         radius = nearest[:, self.neighbors - 1]
         assert (radius > 0).all(), 'latent coincides with graph nodes'
         return ids[:, : self.anchors], nearest[:, : self.anchors], radius
@@ -61,8 +71,8 @@ class NGCCost(nn.Module):
     def forward(self, info_dict):
         predicted = info_dict['predicted_emb'][..., -1, :].detach()
         assert predicted.device == self.nodes.device
-        q = predicted.to(torch.float64)
-        g = info_dict['goal_emb'][:, -1, :].detach().to(torch.float64)
+        q = predicted.to(torch.float32)
+        g = info_dict['goal_emb'][:, -1, :].detach().to(torch.float32)
         batch, samples, dim = q.shape
         assert g.shape == (batch, dim)
         q_ids, q_distance, q_radius = self.attach(q.reshape(-1, dim))

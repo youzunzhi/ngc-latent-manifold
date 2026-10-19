@@ -1,0 +1,16 @@
+# DMC Reacher with its released success rule: every raw joint angle within
+# the threshold of the goal, which ends the dm_control episode.
+task: reacher
+image_size: 224
+world:
+  env_name: swm/ReacherDMControl-v0
+  task: qpos_match
+keys_to_cache: [action]
+callables:
+  - method: set_state
+    args:
+      qpos: {value: qpos}
+      qvel: {value: qvel}
+  - method: set_target_qpos
+    args:
+      target_qpos: {value: goal_qpos}

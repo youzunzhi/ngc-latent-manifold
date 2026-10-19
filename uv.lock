@@ -950,6 +950,18 @@ wheels = [
 ]
 
 [[package]]
+name = "llvmlite"
+version = "0.50.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/11/c5/907cec40688a34eb489cded74d555e1ee4af8cf49d83e03dba2c2d4cfe27/llvmlite-0.50.0.tar.gz", hash = "sha256:f2a2cd6ec9ffcc1b7147dea0d7a49efebf17a2b434e0c2844fe175999d571eb4", size = 194522, upload-time = "2026-09-29T18:44:46.782Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/7a/4f/b0f7d762759b564732e8f6b719b456c285a4e1c85368d3805fd32951ce7b/llvmlite-0.50.0-cp310-cp310-macosx_12_0_arm64.whl", hash = "sha256:211da1b088d566aafa1e444d546f64fc7f13b1af56ff0207a1705d88607be6ab", size = 40534276, upload-time = "2026-09-29T18:42:25.591Z" },
+    { url = "https://files.pythonhosted.org/packages/5d/62/2192e5eeaeb720d9721fa76c47ebad49c39368e84baa95dc0860dc7deda9/llvmlite-0.50.0-cp310-cp310-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:accfc36951230e0e694b41bbfc96ba554284e72f0eab2dde0cf273e4109e51ba", size = 58344486, upload-time = "2026-09-29T18:42:29.507Z" },
+    { url = "https://files.pythonhosted.org/packages/36/05/e24c01d88f671081ebf4ecfeee61b10ec7e2b9e5ab2c544ce6b57143420b/llvmlite-0.50.0-cp310-cp310-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:c2b23236bd0d7ad56a94208263d791956f79c8c45f39458931df556206d4496a", size = 59696589, upload-time = "2026-09-29T18:42:33.589Z" },
+    { url = "https://files.pythonhosted.org/packages/87/d3/853c8e0d91a1570fa06caa15cb94919f038f472b68b5995aaa5c9045ca20/llvmlite-0.50.0-cp310-cp310-win_amd64.whl", hash = "sha256:cda14ab787e609c2c2c5d1386a6d5f8723e9d047d27341585f606c27dc5744ab", size = 41865271, upload-time = "2026-09-29T18:42:37.721Z" },
+]
+
+[[package]]
 name = "loguru"
 version = "0.7.3"
 source = { registry = "https://pypi.org/simple" }
@@ -1169,17 +1181,21 @@ wheels = [
 
 [[package]]
 name = "ngc"
-version = "0.1.0"
+version = "0.2.0"
 source = { editable = "." }
 dependencies = [
     { name = "dm-control" },
     { name = "gymnasium" },
     { name = "h5py" },
     { name = "hdf5plugin" },
+    { name = "huggingface-hub" },
+    { name = "hydra-core" },
     { name = "imageio" },
+    { name = "lightning" },
     { name = "mujoco" },
     { name = "numpy" },
     { name = "ogbench" },
+    { name = "omegaconf" },
     { name = "opencv-python" },
     { name = "pillow" },
     { name = "pygame" },
@@ -1197,16 +1213,27 @@ dependencies = [
     { name = "transformers" },
 ]
 
+[package.dev-dependencies]
+paper = [
+    { name = "matplotlib" },
+    { name = "opentsne" },
+    { name = "umap-learn" },
+]
+
 [package.metadata]
 requires-dist = [
     { name = "dm-control", specifier = "==1.0.43" },
     { name = "gymnasium", specifier = "==1.3.0" },
     { name = "h5py", specifier = "==3.16.0" },
     { name = "hdf5plugin", specifier = "==7.0.0" },
+    { name = "huggingface-hub", specifier = "==0.36.2" },
+    { name = "hydra-core", specifier = "==1.3.7" },
     { name = "imageio", specifier = "==2.37.4" },
+    { name = "lightning", specifier = "==2.6.6" },
     { name = "mujoco", specifier = "==3.10.0" },
     { name = "numpy", specifier = "==2.2.6" },
     { name = "ogbench", specifier = "==1.2.1" },
+    { name = "omegaconf", specifier = "==2.3.1" },
     { name = "opencv-python", specifier = "==5.0.0.93" },
     { name = "pillow", specifier = "==11.3.0" },
     { name = "pygame", specifier = "==2.6.1" },
@@ -1222,6 +1249,29 @@ requires-dist = [
     { name = "torchvision", marker = "sys_platform != 'linux'", specifier = "==0.26.0" },
     { name = "torchvision", marker = "sys_platform == 'linux'", specifier = "==0.26.0", index = "https://download.pytorch.org/whl/cu130" },
     { name = "transformers", specifier = "==4.57.6" },
+]
+
+[package.metadata.requires-dev]
+paper = [
+    { name = "matplotlib", specifier = "==3.10.9" },
+    { name = "opentsne", specifier = "==1.0.2" },
+    { name = "umap-learn", specifier = "==0.5.12" },
+]
+
+[[package]]
+name = "numba"
+version = "0.68.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "llvmlite" },
+    { name = "numpy" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/4e/cd/e8280f9ffa30fea9fabc5341223701231fcc5d53a31f51419d42d4bec3a6/numba-0.68.0.tar.gz", hash = "sha256:8a781de54b980b98f43bff7f1093701b5f07c80d031c7cfa8a87493d8bf73f2d", size = 2855363, upload-time = "2026-09-30T15:05:44.721Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/54/c3/52ee9278fed44d6f16e700ff275a8039d2fd0f13d3c5fe84a65c455dbf49/numba-0.68.0-cp310-cp310-macosx_12_0_arm64.whl", hash = "sha256:080bf1d0dc6adaa834400b6f92e5407de2a7dd80a665f71f74597e95508b2f1f", size = 2760099, upload-time = "2026-09-30T15:04:34.215Z" },
+    { url = "https://files.pythonhosted.org/packages/e3/f0/da33033754578aa1c622e99acf36c02c98b96f43b7571e6f66ba93795460/numba-0.68.0-cp310-cp310-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:791b8d74951e662cb6a4488c8fb382c862459f62c58f4fe69d959a01fc98b6d5", size = 3543558, upload-time = "2026-09-30T15:04:36.597Z" },
+    { url = "https://files.pythonhosted.org/packages/88/31/6368a595bc06c4d9e94bea624037251e2d146f92f712a5c5f0f48d5af921/numba-0.68.0-cp310-cp310-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:3a5ca82e12b665ef30a19c124f0bd766471cf924c71f70638cb9ade72cc3896f", size = 3830367, upload-time = "2026-09-30T15:04:39.484Z" },
+    { url = "https://files.pythonhosted.org/packages/fa/53/344c32e45cf7d59896d872351ca5b630010cc228f27892d9c6a59a753c18/numba-0.68.0-cp310-cp310-win_amd64.whl", hash = "sha256:83c22d3cede341102bc215e373c6db30ac36a4aee46ba3d5fb8a574f7a580933", size = 2831101, upload-time = "2026-09-30T15:04:41.755Z" },
 ]
 
 [[package]]
@@ -1572,6 +1622,22 @@ wheels = [
 ]
 
 [[package]]
+name = "opentsne"
+version = "1.0.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "numpy" },
+    { name = "scikit-learn" },
+    { name = "scipy" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/71/09/357810160298701c979a75c9d4db27e6e8996add0d7879d60cc648341171/opentsne-1.0.2.tar.gz", hash = "sha256:e2aecaa7a487100246f2d3fef9855d1bd6cc02a1c6da8fb2a54583f307aa4229", size = 251206, upload-time = "2024-08-13T11:02:26.161Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/55/8e/2b5b0fb28c721d3023baa36859e209dbbdd45786e1d622ec1e484220d4f3/openTSNE-1.0.2-cp310-cp310-macosx_10_12_universal2.whl", hash = "sha256:c82a2c263e570c75256d58590f7c99273c8f8152fada2e3f36a3de92d165a483", size = 1011876, upload-time = "2024-08-13T11:02:01.899Z" },
+    { url = "https://files.pythonhosted.org/packages/d9/75/e032529880ccd24de86e6c7988a50e0fc8ad001a829aa3a398a947168f15/openTSNE-1.0.2-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:7a7270156cbabc249301cd30f6010387f618295ca68c50913c98b9dad8d9c682", size = 3011808, upload-time = "2024-08-13T11:02:04.65Z" },
+    { url = "https://files.pythonhosted.org/packages/d9/b6/01c699b76282f63b2fea438ba0d22bec15dbcc2e4c30234b729594049e4d/openTSNE-1.0.2-cp310-cp310-win_amd64.whl", hash = "sha256:99c90695c95f09a100216532d1cb7ec24a6269dd005f1e835c1ca0d603d43542", size = 470551, upload-time = "2024-08-13T11:02:06.02Z" },
+]
+
+[[package]]
 name = "opt-einsum"
 version = "3.4.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1830,6 +1896,22 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/53/19/4b3c9415a75317ab9cca02a7a6228d295c4deb7995c5c220c2faf5c3912f/pymunk-7.3.0-cp310-cp310-musllinux_1_2_x86_64.whl", hash = "sha256:ffac650f861795d8b2b54c1240d09c552d87aa8308fcbd43192aa1de0836fc39", size = 1008527, upload-time = "2026-06-17T20:15:43.961Z" },
     { url = "https://files.pythonhosted.org/packages/3e/d9/a5d667a6314136c5eebed61d48ccf5fecb0c85daf986f0ba911e97a4fa77/pymunk-7.3.0-cp310-cp310-win32.whl", hash = "sha256:4c6599afcef9e4ba7165d7cb50018bdd2e2ce35904207f57efdfb9bcd4448558", size = 317784, upload-time = "2026-06-17T20:15:45.984Z" },
     { url = "https://files.pythonhosted.org/packages/27/1c/6f1c9be3d9246959f9071e5ecffea0126c5a2501dd2de7af78ed48d9242f/pymunk-7.3.0-cp310-cp310-win_amd64.whl", hash = "sha256:b8519df3c2b68e01e81a4aeee766d8dce1783c4e4444f0ac056e69789060eab7", size = 370275, upload-time = "2026-06-17T20:15:47.546Z" },
+]
+
+[[package]]
+name = "pynndescent"
+version = "0.6.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "joblib" },
+    { name = "llvmlite" },
+    { name = "numba" },
+    { name = "scikit-learn" },
+    { name = "scipy" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/4a/fb/7f58c397fb31666756457ee2ac4c0289ef2daad57f4ae4be8dec12f80b03/pynndescent-0.6.0.tar.gz", hash = "sha256:7ffde0fb5b400741e055a9f7d377e3702e02250616834231f6c209e39aac24f5", size = 2992987, upload-time = "2026-01-08T21:29:58.943Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b2/e6/94145d714402fd5ade00b5661f2d0ab981219e07f7db9bfa16786cdb9c04/pynndescent-0.6.0-py3-none-any.whl", hash = "sha256:dc8c74844e4c7f5cbd1e0cd6909da86fdc789e6ff4997336e344779c3d5538ef", size = 73511, upload-time = "2026-01-08T21:29:57.306Z" },
 ]
 
 [[package]]
@@ -2444,6 +2526,23 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/e4/31/3d74fa778a63b98b7374323befcc0be5ab3bd94afd4096a0124e7379152c/tzdata-2026.4.tar.gz", hash = "sha256:f1b8bd365d8d210c55353f4d7f8d6d8561c0ba50d704b700d195a9424bba0d79", size = 199350, upload-time = "2026-09-12T12:56:03.251Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/f9/bc/8737e8d54cf51106118039b83f485a4783112fab49ea9d044b234978a46e/tzdata-2026.4-py2.py3-none-any.whl", hash = "sha256:c2169a8b0a7a5e9674da5a135ccdfb2b3e671b333ed9fed17b41f73c34476e81", size = 347494, upload-time = "2026-09-12T12:56:01.67Z" },
+]
+
+[[package]]
+name = "umap-learn"
+version = "0.5.12"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "numba" },
+    { name = "numpy" },
+    { name = "pynndescent" },
+    { name = "scikit-learn" },
+    { name = "scipy" },
+    { name = "tqdm" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/02/ee/af4171241117f85c74b5ca6448ea1033cc28d599c13651d67289bacd4083/umap_learn-0.5.12.tar.gz", hash = "sha256:6aff02ecac5f2aad9f3c65ee518d7ae93e1a985ae38721fdcffceee4232c33c7", size = 96672, upload-time = "2026-04-08T20:03:54.012Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/1b/98/f63318ccbe75c810011fe9233884c5d348d94d90005de1b79e5f93bef9c0/umap_learn-0.5.12-py3-none-any.whl", hash = "sha256:f2a85d2a2adcb52b541bed9b27a23ca169b56bb1b23283abeebfb8dfb8a42fe5", size = 91849, upload-time = "2026-04-08T20:03:52.561Z" },
 ]
 
 [[package]]

@@ -18,9 +18,8 @@ from pathlib import Path
 
 import numpy as np
 import stable_worldmodel as swm
-import torch
 
-from ngc.nodes import encode, sample_rows, training_clips
+from ngc.nodes import encode, load_model, sample_rows, training_clips
 
 
 def excluded_episodes(pair_sets):
@@ -50,10 +49,6 @@ def main():
     parser.add_argument('--out', type=Path, required=True)
     args = parser.parse_args()
     assert not args.out.exists(), f'{args.out} exists'
-    assert torch.cuda.is_available(), 'encoding runs on CUDA'
-    # Full float32 kernels, so a latent does not depend on its batch.
-    torch.set_float32_matmul_precision('highest')
-    torch.backends.cudnn.allow_tf32 = False
 
     clips = swm.data.load_dataset(
         args.dataset,
@@ -64,7 +59,7 @@ def main():
     train = training_clips(clips, args.train_fraction, args.train_seed)
     excluded = excluded_episodes(args.exclude)
     rows = sample_rows(clips, train, excluded, args.count, args.seed)
-    model = swm.wm.utils.load_pretrained(args.checkpoint).cuda().eval()
+    model = load_model(args.checkpoint)
     latents = encode(model, clips, rows, args.image_size, args.batch_size)
     args.out.parent.mkdir(parents=True, exist_ok=True)
     np.savez(args.out, rows=rows, latents=latents)

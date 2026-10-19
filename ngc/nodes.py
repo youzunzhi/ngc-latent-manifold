@@ -9,8 +9,11 @@ a node.
 training clips, loaded with the frameskip and number of steps of training.
 """
 
+from pathlib import Path
+
 import numpy as np
 import stable_pretraining as spt
+import stable_worldmodel as swm
 import torch
 from torchvision.transforms import v2 as transforms
 
@@ -53,6 +56,25 @@ def image_transform(image_size):
             transforms.Resize(size=image_size),
         ]
     )
+
+
+def checkpoint_location(checkpoint):
+    """Resolve existing local checkpoints before upstream cache lookup."""
+    local = Path(checkpoint).expanduser()
+    return str(local.resolve()) if local.exists() else str(checkpoint)
+
+
+def load_model(checkpoint):
+    """World model of ``checkpoint`` on CUDA, in evaluation mode, with full
+    float32 kernels so that a latent does not depend on its batch."""
+    assert torch.cuda.is_available(), 'encoding runs on CUDA'
+    torch.set_float32_matmul_precision('highest')
+    torch.backends.cudnn.allow_tf32 = False
+    model = swm.wm.utils.load_pretrained(
+        checkpoint_location(checkpoint)
+    ).cuda().eval()
+    model.requires_grad_(False)
+    return model
 
 
 def encode(model, clips, rows, image_size, batch_size):

@@ -19,13 +19,16 @@ JOINT_THRESHOLD = 0.05
 
 
 def joint_error(qpos, goal_qpos):
-    """Absolute [shoulder, wrist] error; the shoulder's is at most pi."""
+    """Absolute [..., (shoulder, wrist)] error; the shoulder's is at most
+    pi."""
     delta = np.asarray(qpos, dtype=np.float64) - np.asarray(
         goal_qpos, dtype=np.float64
     )
-    assert delta.shape == (2,)
+    assert delta.shape[-1] == 2
     error = np.abs(delta)
-    error[0] = np.abs(np.arctan2(np.sin(delta[0]), np.cos(delta[0])))
+    error[..., 0] = np.abs(
+        np.arctan2(np.sin(delta[..., 0]), np.cos(delta[..., 0]))
+    )
     return error
 
 

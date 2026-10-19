@@ -2,7 +2,9 @@
 task: pusht
 image_size: 224
 world:
-  env_name: swm/PushT-v1
+  # PushT that records its inputs, so the oracle can replay its state.
+  env_name: ngc/PushTReplay-v1
+  reset_seed: 0
 keys_to_cache: [action, proprio, state]
 callables:
   - method: _set_state

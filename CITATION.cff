@@ -1,0 +1,33 @@
+cff-version: 1.2.0
+message: "Please cite the paper when using this software."
+type: software
+title: "Neighborhood Graph Cost (NGC)"
+version: 0.2.0
+license: MIT
+repository-code: "https://github.com/youzunzhi/ngc-latent-manifold"
+authors:
+  - family-names: You
+    given-names: Zunzhi
+  - family-names: Tao
+    given-names: Linwei
+  - family-names: Xu
+    given-names: Siyu
+  - family-names: Wang
+    given-names: Yunke
+  - family-names: Xu
+    given-names: Chang
+preferred-citation:
+  type: manuscript
+  title: "Latent World Models Should Plan with Distances Along the Latent Manifold"
+  year: 2026
+  authors:
+    - family-names: You
+      given-names: Zunzhi
+    - family-names: Tao
+      given-names: Linwei
+    - family-names: Xu
+      given-names: Siyu
+    - family-names: Wang
+      given-names: Yunke
+    - family-names: Xu
+      given-names: Chang

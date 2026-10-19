@@ -1,139 +1,140 @@
 # Neighborhood Graph Cost (NGC)
 
-NGC is a terminal cost for planning with a latent world model. Instead of
-the Euclidean distance between a predicted latent and the goal latent, it
-measures the distance along the latent manifold: the shortest path over a
-graph of training latents in which each latent is joined to its mutual
-nearest neighbors. The graph is built once, offline; at planning time a
-predicted latent and the goal attach to the graph through their nearest
-graph nodes. NGC needs no training and replaces the cost of an existing
-planner.
+Code for **Latent World Models Should Plan with Distances Along the Latent
+Manifold**, by Zunzhi You, Linwei Tao, Siyu Xu, Yunke Wang, and Chang Xu.
 
-This repository contains NGC, the commands that build its graph from a
-dataset and a [LeWM](https://arxiv.org/abs/2603.19312) checkpoint, and
-the planning evaluation of the paper, on top of
-[stable-worldmodel](https://github.com/galilai-group/stable-worldmodel).
+NGC replaces the terminal cost of a sampling-based planner with distance
+along a graph of training latents. It uses a frozen world model and needs
+no additional training. The graph joins mutual nearest neighbors and
+connects disconnected components with their shortest inter-component edges.
+Predictions and goals attach through their nearest graph nodes. Within
+both local neighborhood radii, NGC uses the direct Euclidean distance.
 
 ## Installation
 
-Linux with a CUDA GPU is required. With [uv](https://docs.astral.sh/uv/):
+Experiments require Linux and an NVIDIA CUDA GPU. Install with
+[uv](https://docs.astral.sh/uv/), from the repository root:
 
 ```bash
-uv sync
+uv sync --frozen
+export PYTHONPATH="$PWD${PYTHONPATH:+:$PYTHONPATH}"
+export MUJOCO_GL=egl PYOPENGL_PLATFORM=egl MPLBACKEND=Agg
 ```
 
-This installs Python 3.10 and the pinned versions in `uv.lock`, with
-PyTorch built for CUDA 13.0.
+The lockfile pins Python 3.10 dependencies and PyTorch for CUDA 13.0.
+`stable-worldmodel` is an unmodified dependency pinned to
+`4506b1a40c4e9feacdac4150903480afe101639f`.
+Run commands from the repository root.
 
-## Using NGC in a planner
-
-`NGCCost` is a stable-worldmodel `Objective`: like the L2 cost `GoalMSE`, it
-reads `predicted_emb` and `goal_emb` and returns one cost per candidate.
+## Use NGC in a planner
 
 ```python
 import numpy as np
 import stable_worldmodel as swm
 from ngc import NGCCost, build_graph
 
-latents = np.load('nodes.npz')['latents']  # [N, D] latents of training frames
-nodes, graph_distance, bridges = build_graph(latents, neighbors=15)
-objective = NGCCost(nodes, graph_distance, neighbors=15, anchors=4).cuda()
+latents = np.load('nodes.npz')['latents']
+nodes, distances, bridges = build_graph(latents, neighbors=15, rule='mutual')
+objective = NGCCost(nodes, distances, neighbors=15, anchors=4).cuda()
 cost = swm.planning.ShootingCostEvaluator(model, objective)
 ```
 
-`build_graph` joins two nodes when each is among the `neighbors` nearest
-nodes of the other. If the graph has more than one component, it adds the
-shortest edges between components until it is connected and returns them
-as `bridges`. `NGCCost` scores a predicted latent `q` against the goal `g`
-by their Euclidean distance when `q` lies within both of their
-neighborhoods (the distance to their `neighbors`-th nearest node), and
-otherwise by the shortest route `q -> v_i -> ... -> v_j -> g` through the
-`anchors` nearest nodes of each.
+This example uses the caller's world model and planning history. The paper's
+executed-action history is implemented in `evaluation/history.py` and used
+by `scripts/evaluate.py`.
 
-## From a dataset to success rates
+## Reproduce the main evaluation
 
-The three commands below sample evaluation pairs, build the graph nodes,
-and plan. They read a stable-worldmodel HDF5 dataset and a LeWM checkpoint
-(a local `.pt` file or a HuggingFace repository such as
-`quentinll/lewm-cube`).
-
-**1. Sample start-goal pairs.** Each pair is a start step in one episode
-and the frame `--goal-offset` steps later; every pair comes from a
-different episode.
+Follow [REPRODUCING.md](REPRODUCING.md) to download the official datasets,
+run the main experiments, and compare the resulting table with the paper.
+Retraining is not required. The paper checkpoints are hosted at
+[Zunzhi/ngc-checkpoints](https://huggingface.co/Zunzhi/ngc-checkpoints).
+Download the four main checkpoints and verify every file's SHA-256:
 
 ```bash
-uv run python scripts/sample_pairs.py --dataset cube_single_expert.h5 \
-    --goal-offset 50 --count 100 --seed 0 --out pairs/cube.json
+uv run python scripts/download_checkpoints.py
 ```
 
-**2. Build the graph nodes.** One frame from each of `--count` training
-episodes, encoded by the checkpoint. The training split is redrawn from the
-split fraction and seed of the checkpoint's training run, over clips of its
-frameskip and length, and the episodes of the given pair files are left
-out, so no evaluation episode enters the graph. The values below are those
-of the LeWM training recipe.
+The downloader uses the immutable revision recorded in
+`artifacts/checkpoint-inventory.json` and preserves the directory layout
+expected by the experiment configuration. Datasets are obtained separately
+from LeWM upstream. The 216 main-table outcome records are included in
+`artifacts/main-results.zip` for checking statistics without rerunning plans.
+
+Copy `experiments/example.yaml` to `experiments/local.yaml` and set the
+dataset paths. The default checkpoint paths match the download layout.
+The `training_datasets` and `official` checkpoint settings are used only by
+optional studies. Then inspect the commands:
 
 ```bash
-uv run python scripts/build_nodes.py --dataset cube_single_expert.h5 \
-    --checkpoint lewm-cube --train-fraction 0.9 --train-seed 3072 \
-    --frameskip 5 --num-steps 4 --exclude pairs/cube.json \
-    --count 5000 --seed 0 --image-size 224 --batch-size 32 \
-    --out nodes/cube.npz
+uv run python -m experiments.run --config experiments/local.yaml --stage main-nodes
+uv run python -m experiments.run --config experiments/local.yaml --stage main-cells
 ```
 
-**3. Plan.** `--cost ngc` or `--cost l2` (the cost LeWM plans with).
+Add `--execute` to each command to run that stage sequentially, nodes first.
+The runner stops on failure or an existing output rather than overwriting
+results. The default output directory is `outputs/paper`.
+
+```bash
+uv run python scripts/summarize.py --root outputs/paper > outputs/main-table.json
+```
+
+Compare the main-table success rates and paired differences with the
+bundled reference outcomes using the reproduction guide. GPU kernels,
+rendering, and stochastic planning can change individual trajectories;
+bitwise-identical outputs are not required.
+
+For one Cube evaluation, after building its nodes:
 
 ```bash
 uv run python scripts/evaluate.py --config configs/cube.yaml \
-    --pairs pairs/cube.json --dataset cube_single_expert.h5 \
-    --checkpoint lewm-cube --cost ngc --nodes nodes/cube.npz \
-    --neighbors 15 --anchors 4 --eval-budget 100 --planner-seed 42 \
-    --out results/cube-ngc.json
+  --pairs pairs/cube/offset50-seed0.json --dataset data/cube_single_expert.h5 \
+  --checkpoint checkpoints/project/cube/weights_epoch_10.pt \
+  --protocol main --dynamics learned --cost ngc \
+  --nodes outputs/paper/nodes/project/cube-seed0.npz \
+  --neighbors 15 --anchors 4 --rule mutual --num-samples 300 --topk 30 \
+  --eval-budget 100 --planner-seed 42 --out outputs/cube-ngc.json
 ```
 
-The result lists every pair with its success and the success rate.
+For L2, use `--cost l2` and omit `--nodes`, `--neighbors`, `--anchors`, and
+`--rule`. The result contains per-pair success, executed actions, planner
+settings, and timings.
 
-### Evaluation protocol
+## Protocol and numerical settings
 
-- Each environment starts from the recorded state of the pair's start row
-  with its velocity set to zero (rest start), since the planner sees only
-  the start frame.
-- CEM (300 samples, 30 iterations, 30 elites) plans five action blocks of
-  five steps and executes all of them before replanning. Each replan sees
-  up to three real frames of the executed rollout and the blocks between
-  them. Actions are clipped to the action space.
-- A pair succeeds when the task's success rule holds at any step within
-  `--eval-budget` steps. The paper uses twice the goal offset.
+- Four tasks, 100 pairs per offset and pair seed, three pair seeds (0, 1, 2),
+  and three planner seeds (42, 43, 44). Offsets are 25/50/100, except TwoRoom
+  at 25/50/75. The evaluation budget is twice the offset.
+- Each pair comes from a different episode within its pair set. The sampler
+  excludes starts already satisfying the success criterion and requires
+  TwoRoom starts and goals to be in different rooms. The committed pairs
+  are generated by this repository, not an external pair generator.
+- Rest start, up to three executed frames with their actual action blocks,
+  CEM with 300 candidates, 30 iterations, and 30 elites. Five blocks of five
+  actions are planned and executed before replanning. Actions are clipped.
+- Each graph has 5,000 nodes, mutual 15-nearest-neighbor edges, and four
+  attachment anchors. Exclude **all three offsets for the same pair seed**
+  from graph sampling. The command generator does this automatically.
+- Online cost uses float32 and matrix-product distances to graph nodes.
+  Direct candidate-goal distance uses differences. Offline graph distances
+  use float64. Evaluation disables TF32 and uses one CPU thread.
+- PushT reset uses seed 0. GPU architecture and floating-point kernels can
+  still affect candidate ordering and trajectories.
 
-| Task | Config | Success rule |
-| --- | --- | --- |
-| Cube | `configs/cube.yaml` | cube within 0.04 m of the goal position (stable-worldmodel) |
-| PushT | `configs/pusht.yaml` | joint agent and block position error below 20 px and block angle within 20 degrees of the goal (stable-worldmodel) |
-| Reacher | `configs/reacher.yaml` | both joints within 0.05 rad of the goal pose, the shoulder angle compared on the circle, checked after each environment step (`evaluation/reacher.py`) |
-| TwoRoom | `configs/tworoom.yaml` | agent within 16 px of the goal (stable-worldmodel) |
+| Task | Success criterion |
+| --- | --- |
+| Cube | Cube within 0.04 m of the goal position |
+| PushT | Joint agent/block position error below 20 px and block angle within 20 degrees |
+| Reacher | Both joint errors below 0.05 rad, with shoulder angle compared on the circle |
+| TwoRoom | Agent within 16 px of the goal |
 
-### Pair files
+Success means the criterion holds at any evaluated step within the budget.
+Planner seeds are repeated measurements within a pair. The summary averages
+these first, then bootstraps pairs for each offset. Analyses pooling offsets
+resample episodes where specified in `analysis/success.py` and `analysis/strata.py`.
 
-```json
-{"goal_offset": 50, "pairs": [{"episode_id": 12, "start_step": 40}, ...]}
-```
+## Citation and license
 
-`episode_id` is the position of the episode in the dataset. Extra fields
-of a pair (such as a `pair_id`) are copied into the result. The pair sets
-of the paper were drawn with the CLEAR-LeWM pair generator, which also
-drops pairs that already succeed at the start and, on TwoRoom, keeps only
-pairs whose start and goal lie in different rooms; `sample_pairs.py` applies
-neither filter.
-
-## Numerical notes
-
-- The package versions follow the environment the paper's results ran in.
-  OpenCV and Pillow resize the rendered frames, so other versions change
-  the pixels the model sees.
-- Encoder latents depend on the GPU architecture at the level of 1e-6
-  (the same frames encoded on an A100 and an RTX 4090 differ in about 90%
-  of their entries). Plans depend on the latents, so success lists from
-  different GPU architectures need not agree pair by pair.
-- PushT resets draw a random goal pose before the recorded state is set,
-  and stable-worldmodel does not seed that draw. Rerunning a PushT
-  evaluation with every seed fixed can change the outcome of a few pairs.
+Citation metadata is in [CITATION.cff](CITATION.cff). This code is available
+under the [MIT License](LICENSE). Dependencies, datasets, and externally
+supplied model weights retain their own terms.

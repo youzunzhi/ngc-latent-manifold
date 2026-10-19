@@ -1,0 +1,505 @@
+{
+  "goal_offset": 25,
+  "pairs": [
+    {
+      "pair_id": 0,
+      "episode_id": 194,
+      "start_step": 71
+    },
+    {
+      "pair_id": 1,
+      "episode_id": 269,
+      "start_step": 71
+    },
+    {
+      "pair_id": 2,
+      "episode_id": 339,
+      "start_step": 20
+    },
+    {
+      "pair_id": 3,
+      "episode_id": 388,
+      "start_step": 57
+    },
+    {
+      "pair_id": 4,
+      "episode_id": 535,
+      "start_step": 6
+    },
+    {
+      "pair_id": 5,
+      "episode_id": 613,
+      "start_step": 64
+    },
+    {
+      "pair_id": 6,
+      "episode_id": 619,
+      "start_step": 68
+    },
+    {
+      "pair_id": 7,
+      "episode_id": 840,
+      "start_step": 20
+    },
+    {
+      "pair_id": 8,
+      "episode_id": 906,
+      "start_step": 70
+    },
+    {
+      "pair_id": 9,
+      "episode_id": 1147,
+      "start_step": 27
+    },
+    {
+      "pair_id": 10,
+      "episode_id": 1155,
+      "start_step": 72
+    },
+    {
+      "pair_id": 11,
+      "episode_id": 1228,
+      "start_step": 28
+    },
+    {
+      "pair_id": 12,
+      "episode_id": 1233,
+      "start_step": 56
+    },
+    {
+      "pair_id": 13,
+      "episode_id": 1322,
+      "start_step": 12
+    },
+    {
+      "pair_id": 14,
+      "episode_id": 1422,
+      "start_step": 47
+    },
+    {
+      "pair_id": 15,
+      "episode_id": 1476,
+      "start_step": 74
+    },
+    {
+      "pair_id": 16,
+      "episode_id": 1588,
+      "start_step": 57
+    },
+    {
+      "pair_id": 17,
+      "episode_id": 2011,
+      "start_step": 71
+    },
+    {
+      "pair_id": 18,
+      "episode_id": 2134,
+      "start_step": 31
+    },
+    {
+      "pair_id": 19,
+      "episode_id": 2460,
+      "start_step": 44
+    },
+    {
+      "pair_id": 20,
+      "episode_id": 2541,
+      "start_step": 25
+    },
+    {
+      "pair_id": 21,
+      "episode_id": 2594,
+      "start_step": 18
+    },
+    {
+      "pair_id": 22,
+      "episode_id": 2602,
+      "start_step": 5
+    },
+    {
+      "pair_id": 23,
+      "episode_id": 2711,
+      "start_step": 56
+    },
+    {
+      "pair_id": 24,
+      "episode_id": 2765,
+      "start_step": 5
+    },
+    {
+      "pair_id": 25,
+      "episode_id": 2798,
+      "start_step": 24
+    },
+    {
+      "pair_id": 26,
+      "episode_id": 2930,
+      "start_step": 20
+    },
+    {
+      "pair_id": 27,
+      "episode_id": 2931,
+      "start_step": 48
+    },
+    {
+      "pair_id": 28,
+      "episode_id": 3022,
+      "start_step": 44
+    },
+    {
+      "pair_id": 29,
+      "episode_id": 3097,
+      "start_step": 15
+    },
+    {
+      "pair_id": 30,
+      "episode_id": 3226,
+      "start_step": 43
+    },
+    {
+      "pair_id": 31,
+      "episode_id": 3288,
+      "start_step": 32
+    },
+    {
+      "pair_id": 32,
+      "episode_id": 3456,
+      "start_step": 29
+    },
+    {
+      "pair_id": 33,
+      "episode_id": 3630,
+      "start_step": 8
+    },
+    {
+      "pair_id": 34,
+      "episode_id": 3682,
+      "start_step": 21
+    },
+    {
+      "pair_id": 35,
+      "episode_id": 3819,
+      "start_step": 7
+    },
+    {
+      "pair_id": 36,
+      "episode_id": 4016,
+      "start_step": 42
+    },
+    {
+      "pair_id": 37,
+      "episode_id": 4065,
+      "start_step": 35
+    },
+    {
+      "pair_id": 38,
+      "episode_id": 4200,
+      "start_step": 29
+    },
+    {
+      "pair_id": 39,
+      "episode_id": 4201,
+      "start_step": 28
+    },
+    {
+      "pair_id": 40,
+      "episode_id": 4241,
+      "start_step": 27
+    },
+    {
+      "pair_id": 41,
+      "episode_id": 4275,
+      "start_step": 44
+    },
+    {
+      "pair_id": 42,
+      "episode_id": 4499,
+      "start_step": 18
+    },
+    {
+      "pair_id": 43,
+      "episode_id": 4509,
+      "start_step": 14
+    },
+    {
+      "pair_id": 44,
+      "episode_id": 4546,
+      "start_step": 75
+    },
+    {
+      "pair_id": 45,
+      "episode_id": 4571,
+      "start_step": 33
+    },
+    {
+      "pair_id": 46,
+      "episode_id": 4589,
+      "start_step": 48
+    },
+    {
+      "pair_id": 47,
+      "episode_id": 4688,
+      "start_step": 14
+    },
+    {
+      "pair_id": 48,
+      "episode_id": 4842,
+      "start_step": 31
+    },
+    {
+      "pair_id": 49,
+      "episode_id": 4975,
+      "start_step": 74
+    },
+    {
+      "pair_id": 50,
+      "episode_id": 5016,
+      "start_step": 60
+    },
+    {
+      "pair_id": 51,
+      "episode_id": 5089,
+      "start_step": 54
+    },
+    {
+      "pair_id": 52,
+      "episode_id": 5119,
+      "start_step": 28
+    },
+    {
+      "pair_id": 53,
+      "episode_id": 5134,
+      "start_step": 34
+    },
+    {
+      "pair_id": 54,
+      "episode_id": 5169,
+      "start_step": 30
+    },
+    {
+      "pair_id": 55,
+      "episode_id": 5307,
+      "start_step": 20
+    },
+    {
+      "pair_id": 56,
+      "episode_id": 5370,
+      "start_step": 56
+    },
+    {
+      "pair_id": 57,
+      "episode_id": 5419,
+      "start_step": 62
+    },
+    {
+      "pair_id": 58,
+      "episode_id": 5482,
+      "start_step": 55
+    },
+    {
+      "pair_id": 59,
+      "episode_id": 5488,
+      "start_step": 61
+    },
+    {
+      "pair_id": 60,
+      "episode_id": 5839,
+      "start_step": 53
+    },
+    {
+      "pair_id": 61,
+      "episode_id": 5948,
+      "start_step": 67
+    },
+    {
+      "pair_id": 62,
+      "episode_id": 6138,
+      "start_step": 69
+    },
+    {
+      "pair_id": 63,
+      "episode_id": 6244,
+      "start_step": 46
+    },
+    {
+      "pair_id": 64,
+      "episode_id": 6412,
+      "start_step": 75
+    },
+    {
+      "pair_id": 65,
+      "episode_id": 6433,
+      "start_step": 24
+    },
+    {
+      "pair_id": 66,
+      "episode_id": 6753,
+      "start_step": 13
+    },
+    {
+      "pair_id": 67,
+      "episode_id": 7172,
+      "start_step": 4
+    },
+    {
+      "pair_id": 68,
+      "episode_id": 7216,
+      "start_step": 74
+    },
+    {
+      "pair_id": 69,
+      "episode_id": 7233,
+      "start_step": 39
+    },
+    {
+      "pair_id": 70,
+      "episode_id": 7449,
+      "start_step": 36
+    },
+    {
+      "pair_id": 71,
+      "episode_id": 7456,
+      "start_step": 57
+    },
+    {
+      "pair_id": 72,
+      "episode_id": 7473,
+      "start_step": 44
+    },
+    {
+      "pair_id": 73,
+      "episode_id": 7533,
+      "start_step": 62
+    },
+    {
+      "pair_id": 74,
+      "episode_id": 7690,
+      "start_step": 61
+    },
+    {
+      "pair_id": 75,
+      "episode_id": 7708,
+      "start_step": 41
+    },
+    {
+      "pair_id": 76,
+      "episode_id": 7744,
+      "start_step": 8
+    },
+    {
+      "pair_id": 77,
+      "episode_id": 7821,
+      "start_step": 50
+    },
+    {
+      "pair_id": 78,
+      "episode_id": 8033,
+      "start_step": 36
+    },
+    {
+      "pair_id": 79,
+      "episode_id": 8110,
+      "start_step": 27
+    },
+    {
+      "pair_id": 80,
+      "episode_id": 8150,
+      "start_step": 31
+    },
+    {
+      "pair_id": 81,
+      "episode_id": 8208,
+      "start_step": 6
+    },
+    {
+      "pair_id": 82,
+      "episode_id": 8209,
+      "start_step": 54
+    },
+    {
+      "pair_id": 83,
+      "episode_id": 8321,
+      "start_step": 72
+    },
+    {
+      "pair_id": 84,
+      "episode_id": 8403,
+      "start_step": 15
+    },
+    {
+      "pair_id": 85,
+      "episode_id": 8522,
+      "start_step": 51
+    },
+    {
+      "pair_id": 86,
+      "episode_id": 8588,
+      "start_step": 14
+    },
+    {
+      "pair_id": 87,
+      "episode_id": 8611,
+      "start_step": 25
+    },
+    {
+      "pair_id": 88,
+      "episode_id": 8705,
+      "start_step": 27
+    },
+    {
+      "pair_id": 89,
+      "episode_id": 8971,
+      "start_step": 12
+    },
+    {
+      "pair_id": 90,
+      "episode_id": 9138,
+      "start_step": 41
+    },
+    {
+      "pair_id": 91,
+      "episode_id": 9194,
+      "start_step": 21
+    },
+    {
+      "pair_id": 92,
+      "episode_id": 9376,
+      "start_step": 12
+    },
+    {
+      "pair_id": 93,
+      "episode_id": 9392,
+      "start_step": 5
+    },
+    {
+      "pair_id": 94,
+      "episode_id": 9549,
+      "start_step": 27
+    },
+    {
+      "pair_id": 95,
+      "episode_id": 9644,
+      "start_step": 50
+    },
+    {
+      "pair_id": 96,
+      "episode_id": 9679,
+      "start_step": 20
+    },
+    {
+      "pair_id": 97,
+      "episode_id": 9739,
+      "start_step": 72
+    },
+    {
+      "pair_id": 98,
+      "episode_id": 9796,
+      "start_step": 70
+    },
+    {
+      "pair_id": 99,
+      "episode_id": 9907,
+      "start_step": 64
+    }
+  ]
+}

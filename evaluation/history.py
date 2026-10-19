@@ -7,10 +7,13 @@ alone. The rollout starts from the latents of these frames and first
 replays the executed blocks, then the candidate blocks.
 
 ``HistoryPolicy`` records every action it returns and, once a block is
-complete, the frame the next call receives. ``HistoryCostEvaluator`` puts
+complete, the frame the next call receives. ``executed_actions`` keeps every
+action each environment executed, and ``solve_seconds`` the wall-clock time
+of every solve. ``HistoryCostEvaluator`` puts
 the executed blocks in front of the candidates before the rollout.
 """
 
+import time
 from collections import deque
 
 import numpy as np
@@ -44,6 +47,8 @@ class HistoryPolicy(WorldModelPolicy):
             deque(maxlen=self.cfg.history_len - 1) for _ in range(env.num_envs)
         ]
         self._pending_actions = [[] for _ in range(env.num_envs)]
+        self.executed_actions = [[] for _ in range(env.num_envs)]
+        self.solve_seconds = []
         self._action_low = env.single_action_space.low
         self._action_high = env.single_action_space.high
 
@@ -93,6 +98,7 @@ class HistoryPolicy(WorldModelPolicy):
         for i in range(n_envs):
             if not dead[i]:
                 self._pending_actions[i].append(executed[i].copy())
+                self.executed_actions[i].append(executed[i].copy())
         return action
 
     def _replan(self, info_dict, i):
@@ -120,7 +126,11 @@ class HistoryPolicy(WorldModelPolicy):
             if self._next_init is not None
             else None
         )
+        # Solvers return actions on the host, so the solve has finished on
+        # the device when the call returns.
+        began = time.perf_counter()
         actions = self.solver(sliced, init_action=init_action)['actions']
+        self.solve_seconds.append(time.perf_counter() - began)
         plan = actions[:, : self.cfg.receding_horizon]
         rest = actions[:, self.cfg.receding_horizon :]
         if self.cfg.warm_start and rest.shape[1] > 0:
@@ -172,3 +182,15 @@ class HistoryCostEvaluator(ShootingCostEvaluator):
         info_dict = self.model.rollout(info_dict, actions)
         info_dict['action_candidates'] = action_candidates
         return info_dict
+
+
+class IndexedHistoryPolicy(HistoryPolicy):
+    """``HistoryPolicy`` whose solves carry ``env_index``, the planned env.
+
+    Used by the oracle, which plans by acting on the environment itself.
+    """
+
+    def get_action(self, info_dict, **kwargs):
+        info_dict = dict(info_dict)
+        info_dict['env_index'] = np.arange(self.env.num_envs)
+        return super().get_action(info_dict, **kwargs)
