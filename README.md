@@ -3,6 +3,8 @@
 Code for **Latent World Models Should Plan with Distances Along the Latent
 Manifold**, by Zunzhi You, Linwei Tao, Siyu Xu, Yunke Wang, and Chang Xu.
 
+[Paper (arXiv)](https://arxiv.org/abs/2610.25013) · [PDF](https://arxiv.org/pdf/2610.25013)
+
 NGC replaces the terminal cost of a sampling-based planner with distance
 along a graph of training latents. It uses a frozen world model and needs
 no additional training. The graph joins mutual nearest neighbors and

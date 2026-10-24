@@ -20,6 +20,8 @@ preferred-citation:
   type: manuscript
   title: "Latent World Models Should Plan with Distances Along the Latent Manifold"
   year: 2026
+  doi: "10.48550/arXiv.2610.25013"
+  url: "https://arxiv.org/abs/2610.25013"
   authors:
     - family-names: You
       given-names: Zunzhi
